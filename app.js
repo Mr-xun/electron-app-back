@@ -1,13 +1,15 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
-var app = express();
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const expressJwt = require('express-jwt')//token认证
+const setting = require('./token.config')
+const verify = require(path.join(__dirname,'public/token.verify'))
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+console.log(__dirname,path.join(__dirname,'token.config'),'ss')
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -20,7 +22,40 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+//解析token获取用户信息
+app.use((req,res,next)=>{
+	//获取请求头信息
+	let token = req.headers[setting.token.header];
+	if(token ==undefined){
+		next()
+	}else{
+		//token验证
+		verify.getToken(token).then(data=>{
+			req.data =data
+			return next()
+		}).catch(_=>{
+			return next()
+		})
+	}
+})
 
+app.use(expressJwt({
+	secret:setting.token.signKey
+}).unless({
+	//不验证该地址
+	path:setting.token.unRoute
+}))
+
+//当token失效返回提示信息
+app.use((err, req, res, next) => {
+    if (err.status === 401) {
+        return res.status(err.status).json({
+            status: err.status,
+            msg: 'The token is invalid',
+            error: err.name + ':' + err.message
+        })
+    }
+})
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
 	next(createError(404));
