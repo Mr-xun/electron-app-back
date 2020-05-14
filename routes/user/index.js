@@ -21,7 +21,7 @@ router.post('/login', (req, res, next) => {
 				});
 			} else {
 				res.json({
-					mesg: '登录失败',
+					mesg: '登录失败,无该用户',
 					code: -1
 				});
 			}
