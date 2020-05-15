@@ -23,7 +23,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
 	//获取请求头信息
 	let token = req.headers[setting.token.header];
-	console.log(token, 'token');
 	if (token == undefined) {
 		next();
 	} else {

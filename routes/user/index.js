@@ -3,14 +3,20 @@ const router = new express.Router();
 const DB = require('../../modules/db');
 const MD5 = require('md5-node');
 const verify = require('../../public/token.verify');
+
+/**
+ * status:401 用户没权限
+ *        101 mongo操作失败  
+ */
+
 router.post('/login', (req, res, next) => {
 	let { username, password } = req.body;
-	DB.find('user', { username, password: MD5(password) }, (err, data) => {
+	DB.find('user', { username, password: MD5(password) }, (err, { data, total }) => {
 		if (err) {
 			console.log(err);
 			return res.status(101).send(err);
 		} else {
-			if (data.length) {
+			if (total) {
 				verify.setToken(username, data[0]._id).then((result) => {
 					return res.json({
 						token: result,
@@ -25,6 +31,32 @@ router.post('/login', (req, res, next) => {
 					code: -1
 				});
 			}
+		}
+	});
+});
+router.get('/currentUser', (req, res) => {
+	let { email, _id } = req.data;
+	DB.find('user', { username: email, _id: new DB.ObjectID(_id) }, (err, { data, total }) => {
+		if (err) {
+			console.log(err);
+			return res.status(101).send(err);
+		}
+		if (total) {
+			let user = {
+				username: data[0].username,
+				id: data[0]._id,
+				sex: null
+			};
+			return res.json({
+				code: 0,
+				msg: '获取当前用户成功',
+				userInfo: user
+			});
+		} else {
+			return res.json({
+				mesg: '获取当前用户失败',
+				code: -1
+			});
 		}
 	});
 });
@@ -44,8 +76,25 @@ router.post('/register', (req, res) => {
 		});
 	});
 });
-router.get('/list', (req, res) => {
-	DB.find('user', {}, (err, data) => {
+router.post('/del', (req, res) => {
+	let { userId } = req.body;
+	DB.deleteOne('user', { _id: new DB.ObjectID(userId) }, (err, data) => {
+		if (err) {
+			return res.status(101).send(err);
+		}
+		return res.send({
+			code: 0,
+			msg: '删除用户成功'
+		});
+	});
+});
+router.post('/list', (req, res) => {
+	let { username, pageNum, pageSize } = req.body;
+	let query = {};
+	if (username) {
+		query.username = username;
+	}
+	DB.find('user', { $or: [ query ] }, { pageNum, pageSize }, (err, { data, total }) => {
 		if (err) {
 			console.log(err);
 			return;
@@ -53,6 +102,9 @@ router.get('/list', (req, res) => {
 		return res.json({
 			code: 0,
 			list: data,
+			total: total,
+			currentPage: Number(pageNum),
+			pageSize: Number(pageSize),
 			msg: '获取用户列表成功'
 		});
 	});

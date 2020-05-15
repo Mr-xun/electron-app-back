@@ -12,19 +12,28 @@ async function __connectDB(callback) {
 	});
 }
 //查找
-//db.collection('user).find({})
-exports.find = function(collectionname, json, callback) {
-	__connectDB((db, client) => {
-		let result = db.collection(collectionname).find(json);
+//db.collection('user).find({},{pageSize:10,pageNum:1})
+exports.find = function(collectionname, ...query) {
+	let fn = Array.prototype.pop.apply(arguments); //回调方法
+	let jsonQuery = query.length ? query[0] : {};
+	let pageQuery = query.length && query.length > 1 ? query[1] : {}; //翻页条件
+	__connectDB(async (db, client) => {
+		let result = db.collection(collectionname).find(jsonQuery);
+		//判断是否分页
+		if (pageQuery.pageNum || pageQuery.pageSize) {
+			let pageSize = pageQuery.pageSize ? Number(pageQuery.pageSize) : 1,
+				pageNum = pageQuery.pageNum ? Number(pageQuery.pageNum) : 1;
+			result = result.skip((pageNum - 1) * pageSize).limit(pageSize);
+		}
+		let total = await result.count();
 		result.toArray((err, data) => {
-			callback(err, data);
+			fn(err, { data, total });
 			client.close();
 		});
 	});
 };
 //新增一条
 exports.insertOne = function(collectionname, json, callback) {
-	console.log(json);
 	__connectDB((db, client) => {
 		db.collection(collectionname).insertOne(json, (err, data) => {
 			callback(err, data);
@@ -51,4 +60,4 @@ exports.updateOne = function(collectionname, json1, json2, callback) {
 	});
 };
 
-exports.ObjectID = ObjectID;
+exports.ObjectID = ObjectID; //暴露ObjectID
