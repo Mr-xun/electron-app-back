@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const setting = require('../token.config');
 const verify = {
-	setToken(email, _id) {
+	setToken(username, _id) {
 		return new Promise((resolve, reject) => {
 			let token = jwt.sign(
 				{
-					email,
+					username,
 					_id
 				},
 				//秘钥
