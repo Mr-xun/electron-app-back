@@ -9,8 +9,17 @@ const verify = require('../../public/token.verify');
  */
 
 router.post('/login', (req, res, next) => {
-	let { username, password } = req.body;
-	DB.find('user', { username, password: MD5(password) }, (err, { data, total }) => {
+	let {
+		username,
+		password
+	} = req.body;
+	DB.find('user', {
+		username,
+		password: MD5(password)
+	}, (err, {
+		data,
+		total
+	}) => {
 		if (err) {
 			console.log(err);
 			return res.json({
@@ -44,8 +53,17 @@ router.get('/logout', (req, res) => {
 	});
 });
 router.get('/currentUser', (req, res) => {
-	let { username, _id } = req.data;
-	DB.find('user', { username: username, _id: new DB.ObjectID(_id) }, (err, { data, total }) => {
+	let {
+		username,
+		_id
+	} = req.data;
+	DB.find('user', {
+		username: username,
+		_id: new DB.ObjectID(_id)
+	}, (err, {
+		data,
+		total
+	}) => {
 		if (err) {
 			console.log(err);
 			return res.json({
@@ -75,7 +93,13 @@ router.get('/currentUser', (req, res) => {
 });
 router.post('/register', (req, res) => {
 	//role 角色 1 管理者 0 普通用户
-	let { username, password, avatar = '/images/20200518163731_18641.jpg', role = 1, phone } = req.body;
+	let {
+		username,
+		password,
+		avatar = '/images/20200518163731_18641.jpg',
+		role = 1,
+		phone
+	} = req.body;
 	let regParams = {
 		username,
 		password: MD5(password),
@@ -89,7 +113,12 @@ router.post('/register', (req, res) => {
 			msg: '请输入用户名及密码'
 		});
 	} else {
-		DB.find('user', { username }, (err, { data, total }) => {
+		DB.find('user', {
+			username
+		}, (err, {
+			data,
+			total
+		}) => {
 			if (err) {
 				console.log(err);
 				return res.json({
@@ -123,8 +152,12 @@ router.post('/register', (req, res) => {
 	}
 });
 router.post('/del', (req, res) => {
-	let { userId } = req.body;
-	DB.fakeDelete('user', { _id: new DB.ObjectID(userId) }, (err, data) => {
+	let {
+		userId
+	} = req.body;
+	DB.fakeDelete('user', {
+		_id: new DB.ObjectID(userId)
+	}, (err, data) => {
 		if (err) {
 			console.log(err);
 			return res.send({
@@ -140,12 +173,24 @@ router.post('/del', (req, res) => {
 	});
 });
 router.post('/list', (req, res) => {
-	let { username, pageNum, pageSize } = req.body;
+	let {
+		username,
+		pageNum,
+		pageSize
+	} = req.body;
 	let query = {};
 	if (username) {
 		query.username = username;
 	}
-	DB.find('user', { $or: [ query ] }, { pageNum, pageSize }, (err, { data, total }) => {
+	DB.find('user', {
+		$or: [query]
+	}, {
+		pageNum,
+		pageSize
+	}, (err, {
+		data,
+		total
+	}) => {
 		if (err) {
 			console.log(err);
 			return res.json({
@@ -165,7 +210,15 @@ router.post('/list', (req, res) => {
 	});
 });
 router.post('/resetpwd', (req, res) => {
-	let { userId, account, verify_one, verify_two, verify_three, newpwd } = req.body;
+	
+	let {
+		userId,
+		account,
+		verify_one,
+		verify_two,
+		verify_three,
+		newpwd
+	} = req.body;
 	let queryJson = {};
 	if (verify_one == '鲁丰冷食销售中心' && verify_two == '孔喆' && verify_three == '荀燕') {
 		if (userId) {
@@ -179,7 +232,7 @@ router.post('/resetpwd', (req, res) => {
 		} else {
 			return res.json({
 				code: -1,
-				msg: '重置失败，请输入用户名'
+				msg: '密码修改失败，请输入用户名'
 			});
 		}
 		if (!newpwd) {
@@ -188,18 +241,43 @@ router.post('/resetpwd', (req, res) => {
 				msg: '请输入新密码'
 			});
 		}
-		DB.updateOne('user', queryJson, { password: MD5(newpwd) }, false, (err, data) => {
+		DB.find('user', queryJson, (err, {
+			data,
+			total
+		}) => {
 			if (err) {
+				console(err)
 				return res.json({
 					code: 5001,
-					msg: '重置失败'
+					msg: '密码修改失败',
+					err
 				});
 			}
-			return res.json({
-				code: 0,
-				msg: '重置完成'
-			});
-		});
+			if (!total) {
+				return res.json({
+					code: -1,
+					msg: '无该用户'
+				})
+			} else {
+				DB.updateOne('user', queryJson, {
+					password: MD5(newpwd)
+				}, false, (err, data) => {
+					if (err) {
+						console.log(err)
+						return res.json({
+							code: 5001,
+							msg: '密码修改失败',
+							err
+						});
+					}
+					return res.json({
+						code: 0,
+						msg: '密码修改完成'
+					});
+				});
+			}
+		})
+
 	} else {
 		return res.json({
 			code: -1,
