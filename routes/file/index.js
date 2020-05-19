@@ -70,7 +70,7 @@ router.post('/upload', function(req, res, next) {
 			if (err) {
 				console.log(err);
 				return res.json({
-					code: 401,
+					code: -1,
 					message: '图片上传失败,' + err
 				});
 			} else {

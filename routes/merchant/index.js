@@ -46,42 +46,64 @@ router.post('/add', (req, res) => {
 	};
 	let MERCHANT_COUNTER = 1; //商户编码
 	let { username, _id } = req.data;
-	DB.findOneAndUpdate('field_counter', { _id: new DB.ObjectID(_id) }, { $inc: { merchant_counter: 1 } }, (data) => {
-		if (data.value && data.value.merchant_counter) {
-			MERCHANT_COUNTER = data.value.merchant_counter;
+	DB.find('merchant', { merchant_name }, (err, { data, total }) => {
+		if (err) {
+			console.log(err);
+			return res.json({
+				code: 5001,
+				msg: '创建失败',
+				err
+			});
+		}
+		if (total) {
+			return res.json({
+				code: -1,
+				msg: '该商户已被注册'
+			});
 		} else {
-			DB.updateOne(
+			DB.findOneAndUpdate(
 				'field_counter',
 				{ _id: new DB.ObjectID(_id) },
-				{ merchant_counter: 1, username: username },
-				true,
-				(err) => {
-					if (err) {
-						console.log(err);
-						return res.json({
-							code: -1,
-							msg: '创建失败'
-						});
+				{ $inc: { merchant_counter: 1 } },
+				(data) => {
+					if (data.value && data.value.merchant_counter) {
+						MERCHANT_COUNTER = data.value.merchant_counter;
+					} else {
+						DB.updateOne(
+							'field_counter',
+							{ _id: new DB.ObjectID(_id) },
+							{ merchant_counter: 1, username: username },
+							true,
+							(err) => {
+								if (err) {
+									console.log(err);
+									return res.json({
+										code: -1,
+										msg: '创建失败'
+									});
+								}
+							}
+						);
 					}
+					let MERCHANT_CODE = 'MC' + utils.PrefixInteger(MERCHANT_COUNTER, 4);
+					insertJson.merchant_code = MERCHANT_CODE;
+					DB.insertOne('merchant', insertJson, (err) => {
+						if (err) {
+							console.log(err);
+							return res.json({
+								code: 5001,
+								msg: '创建商户失败',
+								err
+							});
+						}
+						return res.json({
+							code: 0,
+							msg: '创建商户成功'
+						});
+					});
 				}
 			);
 		}
-		let MERCHANT_CODE = 'MC' + utils.PrefixInteger(MERCHANT_COUNTER, 4);
-		insertJson.merchant_code = MERCHANT_CODE;
-		DB.insertOne('merchant', insertJson, (err) => {
-			if (err) {
-				console.log(err);
-				return res.json({
-					code: 5001,
-					msg: '创建商户失败',
-					err
-				});
-			}
-			return res.json({
-				code: 0,
-				msg: '创建商户成功'
-			});
-		});
 	});
 });
 router.post('/update', (req, res) => {
