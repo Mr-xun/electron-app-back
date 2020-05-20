@@ -14,5 +14,4 @@ router.use('/goods', goodsRouter);
 router.use('/merchant', merchantRouter);
 router.use('/fieldCounter', fieldCounterRouter);
 router.use('/file', fileRouter);
-
 module.exports = router;
