@@ -5,6 +5,7 @@ const formidable = require('formidable');
 const sd = require('silly-datetime');
 //图片上传
 router.post('/upload', function(req, res, next) {
+	let HOST = req.headers.host;
 	let IMAGE_UPLOAD_FOLDER = '/images';
 	//创建上传表单
 	var form = new formidable.IncomingForm();
@@ -29,9 +30,8 @@ router.post('/upload', function(req, res, next) {
 		if (filesFile.size > form.maxFieldsSize) {
 			fs.unlink(filesFile.path);
 			return res.json({
-				status: '1',
-				msg: '图片大小不能超过2M',
-				result: ''
+				code: -1,
+				msg: '图片大小不能超过2M'
 			});
 		}
 		//后缀名
@@ -52,9 +52,8 @@ router.post('/upload', function(req, res, next) {
 		}
 		if (extName.length == 0) {
 			return res.json({
-				status: '1',
-				msg: '只支持png和jpg格式图片',
-				result: ''
+				status: -1,
+				msg: '只支持png和jpg格式图片'
 			});
 		}
 		//使用第三方模块silly-datetime
@@ -71,14 +70,14 @@ router.post('/upload', function(req, res, next) {
 				console.log(err);
 				return res.json({
 					code: -1,
-					message: '图片上传失败,' + err
+					message: '图片上传失败'
 				});
 			} else {
 				return res.json({
-					status: '0',
+					code: 0,
 					msg: '图片上传成功',
 					result: {
-						data: IMAGE_UPLOAD_FOLDER + '/' + imageName
+						data: 'http://' + HOST + IMAGE_UPLOAD_FOLDER + '/' + imageName
 					}
 				});
 			}

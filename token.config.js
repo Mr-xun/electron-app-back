@@ -8,6 +8,10 @@ module.exports = {
 		//过期时间
 		signTime: 3600 * 24 * 3,
 		//不需要验证的路由
-		unRoute: [ { url: '/user/login', methods: [ 'POST' ] }, { url: '/user/register', methods: [ 'POST' ] } ]
+		unRoute: [
+			{ url: '/user/login', methods: [ 'POST' ] },
+			{ url: '/user/register', methods: [ 'POST' ] },
+			{ url: '/user/resetpwd', methods: [ 'POST' ] }
+		]
 	}
 };

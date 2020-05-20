@@ -11,8 +11,10 @@
         "ejs": "~2.6.1",
         "express": "~4.16.1",
         "express-jwt": "^5.3.3",
+        "formidable": "^1.2.2",
         "http-errors": "~1.6.3",
         "md5-node": "^1.0.1",
+        "moment": "^2.25.3",
         "mongodb": "^3.3.0",
         "morgan": "~1.9.1",
         "silly-datetime": "^0.1.2"
