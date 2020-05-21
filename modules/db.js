@@ -85,11 +85,43 @@ exports.fakeDelete = function(collectionname, json, callback) {
  * @param {Object} updateJson 更新集合
  * @param {Object} upsert 无数据是否新增
  * @param {Function} callback 回调函数
- * @description 修改
+ * @description 更新一条
  */
 exports.updateOne = function(collectionname, queryJson, updateJson, upsert = false, callback) {
 	__connectDB((db, client) => {
 		db.collection(collectionname).updateOne(queryJson, { $set: updateJson }, { upsert: upsert }, (err, data) => {
+			callback(err, data);
+			client.close();
+		});
+	});
+};
+/**
+ * @param {String} collectionname 表集合
+ * @param {Object} queryJson 查询条件
+ * @param {Object} customUpdateJson 自定义更新集合
+ * @param {Object} customConfig 自定义配置
+ * @param {Function} callback 回调函数
+ * @description 自定义配置更新
+ */
+exports.updateCustom = function(collectionname, queryJson, customUpdateJson, customConfig, callback) {
+	__connectDB((db, client) => {
+		db.collection(collectionname).updateOne(queryJson, customUpdateJson, customConfig, (err, data) => {
+			callback(err, data);
+			client.close();
+		});
+	});
+};
+/**
+ * @param {String} collectionname 表集合
+ * @param {Object} queryJson 查询条件
+ * @param {Object} customUpdateJson 自定义更新集合
+ * @param {Object} customConfig 自定义配置
+ * @param {Function} callback 回调函数
+ * @description 多个同时更新
+ */
+exports.updateManyPull = function(collectionname, queryJson, customUpdateJson, callback) {
+	__connectDB((db, client) => {
+		db.collection(collectionname).updateMany(queryJson, customUpdateJson, (err, data) => {
 			callback(err, data);
 			client.close();
 		});

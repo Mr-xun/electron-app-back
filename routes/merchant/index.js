@@ -20,7 +20,6 @@ router.post('/list', (req, res) => {
 			console.log(err);
 			return res.json({
 				code: 5001,
-
 				msg: '获取商户列表失败',
 				err
 			});
@@ -46,7 +45,6 @@ router.post('/add', (req, res) => {
 		merchant_icon: req.body.merchant_icon || 'http://' + req.headers.host + '/images/20200518163731_18641.jpg',
 		create_time: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
 	};
-	console.log(insertJson, '23');
 	let MERCHANT_COUNTER = 1; //商户编码
 	DB.find('merchant', { merchant_name: insertJson.merchant_name }, (err, { data, total }) => {
 		if (err) {
@@ -77,7 +75,7 @@ router.post('/add', (req, res) => {
 						}
 					});
 				}
-				let MERCHANT_CODE = 'MC' + utils.PrefixInteger(MERCHANT_COUNTER, 4);
+				let MERCHANT_CODE = 'MC' + utils.PrefixInteger(MERCHANT_COUNTER, 3);
 				insertJson.merchant_code = MERCHANT_CODE;
 				DB.insertOne('merchant', insertJson, (err) => {
 					if (err) {
