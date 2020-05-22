@@ -68,15 +68,10 @@ router.get('/currentUser', (req, res) => {
 				});
 			}
 			if (total) {
-				let user = {
-					username: data[0].username,
-					id: data[0]._id,
-					sex: null
-				};
 				return res.json({
 					code: 0,
 					msg: '获取当前用户成功',
-					userInfo: user
+					userInfo: data[0]
 				});
 			} else {
 				return res.json({
@@ -89,21 +84,14 @@ router.get('/currentUser', (req, res) => {
 });
 router.post('/register', (req, res) => {
 	//role 角色 1 管理者 0 普通用户
-	let {
-		username,
-		password,
-		avatar = 'http://' + req.headers.host + '/images/20200518163731_18641.jpg',
-		role = 1,
-		phone
-	} = req.body;
 	let regParams = {
-		username,
-		password: MD5(password),
-		role,
-		phone,
-		avatar
+		username:req.body.username,
+		password: MD5(req.body.password),
+		role:req.body.role,
+		phone:req.body.phone,
+		avatar:req.body.avatar || 'http://' + req.headers.host + '/images/20200518163731_18641.jpg'
 	};
-	if (!username || !password) {
+	if (!req.body.username || !req.body.password) {
 		return res.json({
 			code: -1,
 			msg: '请输入用户名及密码'
@@ -112,7 +100,7 @@ router.post('/register', (req, res) => {
 		DB.find(
 			'user',
 			{
-				username
+				username:req.body.username
 			},
 			(err, { data, total }) => {
 				if (err) {
@@ -149,11 +137,11 @@ router.post('/register', (req, res) => {
 	}
 });
 router.post('/del', (req, res) => {
-	let { userId } = req.body;
+	let { user_id } = req.body;
 	DB.fakeDelete(
 		'user',
 		{
-			_id: new DB.ObjectID(userId)
+			_id: new DB.ObjectID(user_id)
 		},
 		(err, data) => {
 			if (err) {
@@ -276,4 +264,41 @@ router.post('/resetpwd', (req, res) => {
 		});
 	}
 });
+router.post('/update',(req,res)=>{
+	let updateJson = {
+		username:req.body.username,
+		avatar:req.body.avatar ||'http://' + req.headers.host + '/images/20200518163731_18641.jpg',
+		role:req.body.role,
+		phone:req.body.phone,
+	}
+	DB.updateOne('user',{ _id: new DB.ObjectID(req.body.user_id) }, updateJson, false,(err)=>{
+		if(err){
+			return res.json({
+				code:5001,msg:'用户更新信息失败',
+				err
+			})
+		}
+		return res.json({
+			code:0,
+			msg:'用户更新信息成功'
+		})
+	})
+})
+router.post("/del",(req,res)=>{
+	let {user_id} = req.body
+	DB.fakeDelete("user",{_id:new DB.ObjectID(user_id)},(err)=>{
+		if(err){
+			console.log(err)
+			return res.json({
+				code:5001,
+				msg:'删除用户失败',
+				err
+			})
+		}
+		return res.json({
+			code:0,
+			msg:"删除用户成功"
+		})
+	})
+})
 module.exports = router;
