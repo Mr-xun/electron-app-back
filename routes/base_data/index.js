@@ -3,7 +3,6 @@ const router = new express.Router();
 const DB = require('../../modules/db');
 router.get('/brand', (req, res) => {
 	DB.find('brand', {}, (err, { data, total }) => {
-		console.log(data, 1);
 		let retrunData = [];
 		data.forEach((item) => {
 			retrunData.push({
@@ -20,14 +19,13 @@ router.get('/brand', (req, res) => {
 		}
 		return res.json({
 			code: 0,
-			data: retrunData,
+			list: retrunData,
 			meg: '获取品牌成功'
 		});
 	});
 });
 router.get('/merchant', (req, res) => {
 	DB.find('merchant', {}, (err, { data, total }) => {
-		console.log(data, 2);
 		if (err) {
 			return res.json({
 				code: 5001,
@@ -43,7 +41,7 @@ router.get('/merchant', (req, res) => {
 		});
 		return res.json({
 			code: 0,
-			data: retrunData,
+			list: retrunData,
 			msg: '获取商户成功'
 		});
 	});

@@ -119,7 +119,7 @@ exports.updateCustom = function(collectionname, queryJson, customUpdateJson, cus
  * @param {Function} callback 回调函数
  * @description 多个同时更新
  */
-exports.updateManyPull = function(collectionname, queryJson, customUpdateJson, callback) {
+exports.updateMany = function(collectionname, queryJson, customUpdateJson, callback) {
 	__connectDB((db, client) => {
 		db.collection(collectionname).updateMany(queryJson, customUpdateJson, (err, data) => {
 			callback(err, data);

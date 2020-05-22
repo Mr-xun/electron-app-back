@@ -5,7 +5,7 @@ router.post('/add', async (req, res) => {
 	let { merchant_code, merchant_name, goods_id, goods_price } = req.body;
 	DB.find(
 		'goods',
-		{ _id: new DB.ObjectID(goods_id), 'goods_tradePrices.template_code': merchant_code },
+		{ _id: new DB.ObjectID(goods_id), 'goods_tradePriceTemps.template_code': merchant_code },
 		(err, { data, total }) => {
 			if (err) {
 				console.log(err);
@@ -29,7 +29,7 @@ router.post('/add', async (req, res) => {
 					{
 						$addToSet: {
 							//去重复更新数组
-							goods_tradePrices: {
+							goods_tradePriceTemps: {
 								template_code: merchant_code,
 								template_name: merchant_name,
 								template_price: goods_price
@@ -58,7 +58,7 @@ router.post('/add', async (req, res) => {
 });
 router.post('/del', (req, res) => {
 	let { merchant_code } = req.body;
-	DB.updatePull('goods', {}, { $pull: { goods_tradePrices: { template_code: merchant_code } } }, (err, data) => {
+	DB.updateMany('goods', {}, { $pull: { goods_tradePriceTemps: { template_code: merchant_code } } }, (err, data) => {
 		if (err) {
 			console.log(err);
 			return res.json({
@@ -67,7 +67,6 @@ router.post('/del', (req, res) => {
 				err
 			});
 		}
-		console.log(data, 333);
 		return res.json({
 			code: 0,
 			msg: '删除价格模板成功'

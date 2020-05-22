@@ -18,6 +18,7 @@
         "moment": "^2.25.3",
         "mongodb": "^3.3.0",
         "morgan": "~1.9.1",
-        "silly-datetime": "^0.1.2"
+        "silly-datetime": "^0.1.2",
+        "transliteration": "^2.1.11"
     }
 }

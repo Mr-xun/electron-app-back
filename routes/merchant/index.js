@@ -114,6 +114,22 @@ router.post('/update', (req, res) => {
 				err
 			});
 		}
+		DB.updateMany(
+			'goods',
+			{ 'goods_tradePriceTemps.template_code': req.body.merchant_code },
+			{
+				$set: {
+					'goods_tradePriceTemps.$.template_name': updateJson.merchant_name
+				}
+			},
+			(err) => {
+				if (err) {
+					console.log(error + ':' + err, '更新商品价格模板名称失败');
+				} else {
+					console.log('更新商品价格模板名称成功');
+				}
+			}
+		);
 		return res.json({
 			code: 0,
 			msg: '商户更新成功'
@@ -121,7 +137,7 @@ router.post('/update', (req, res) => {
 	});
 });
 router.post('/del', (req, res) => {
-	let { id } = req.body;
+	let { id, merchant_code } = req.body;
 	DB.fakeDelete('merchant', { _id: new DB.ObjectID(id) }, (err) => {
 		if (err) {
 			console.log(err);
@@ -131,6 +147,13 @@ router.post('/del', (req, res) => {
 				err
 			});
 		}
+		DB.updateMany('goods', {}, { $pull: { goods_tradePriceTemps: { template_code: merchant_code } } }, (err) => {
+			if (err) {
+				console.log(error + ':' + err, '删除所有存在改商户的价格模板失败');
+			} else {
+				console.log('删除所有存在改商户的价格模板成功');
+			}
+		});
 		return res.json({
 			code: 0,
 			msg: '删除商户成功'
