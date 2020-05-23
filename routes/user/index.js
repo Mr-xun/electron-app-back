@@ -91,7 +91,8 @@ router.post('/register', (req, res) => {
 		phone:req.body.phone,
 		avatar:req.body.avatar || 'http://' + req.headers.host + '/images/20200518163731_18641.jpg'
 	};
-	if (!req.body.username || !req.body.password) {
+	regParams.role_name = regParams.role == 1?"管理员":"员工"
+	if (!regParams.username || !regParams.password) {
 		return res.json({
 			code: -1,
 			msg: '请输入用户名及密码'
@@ -271,6 +272,7 @@ router.post('/update',(req,res)=>{
 		role:req.body.role,
 		phone:req.body.phone,
 	}
+	updateJson.role_name = updateJson.role == 1?"管理员":"员工"
 	DB.updateOne('user',{ _id: new DB.ObjectID(req.body.user_id) }, updateJson, false,(err)=>{
 		if(err){
 			return res.json({
