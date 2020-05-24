@@ -8,7 +8,7 @@ const fileRouter = require('./file/index');
 const brandRouter = require('./brand/index');
 const baseDataRouter = require('./base_data/index');
 const templateRouter = require('./template/index');
-
+const wholesaleRouter = require("./wholesale/index")
 /**
  * status:401 用户没权限
  *        5001 服务端或mongo操作失败  
@@ -21,5 +21,6 @@ router.use('/file', fileRouter);
 router.use('/brand', brandRouter);
 router.use('/basedata', baseDataRouter);
 router.use('/template', templateRouter);
+router.use('/wholesale', wholesaleRouter);
 
 module.exports = router;

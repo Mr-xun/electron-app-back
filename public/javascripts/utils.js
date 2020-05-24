@@ -5,6 +5,9 @@
  * @description 指定长度为数字前面补零输出
  */
 let PrefixInteger = function(num, length) {
+	if(num.toString().length>length){
+		return num
+	}
 	return (Array(length).join('0') + num).slice(-length);
 };
 exports.PrefixInteger = PrefixInteger;
