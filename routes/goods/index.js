@@ -5,7 +5,7 @@ const DB = require('../../modules/db');
 const utils = require('../../public/javascripts/utils');
 const moment = require('moment');
 router.post('/list', (req, res) => {
-	let { goods_name, goods_brand, goods_num, goods_pinyin, pageSize, pageNum } = req.body;
+	let { goods_name, goods_brand, goods_num, goods_sign, pageSize, pageNum } = req.body;
 	let query = {};
 
 	if (goods_name) {
@@ -17,13 +17,13 @@ router.post('/list', (req, res) => {
 	if (goods_num) {
 		query.goods_num = goods_num;
 	}
-	if (goods_pinyin) {
+	if (goods_sign) {
 		let str = '';
-		goods_pinyin.split('').forEach((item) => {
+		goods_sign.split('').forEach((item) => {
 			str += `(?=.*${item})`;
 		});
 		let regexp = new RegExp(str);
-		query.goods_pinyin = regexp;
+		query.goods_sign = regexp;
 	}
 	DB.find(
 		'goods',
@@ -156,8 +156,8 @@ router.post('/add', (req, res) => {
 										GOODS_NUM +
 										transliterate.slugify(insertJson.goods_name, {
 											lowercase: true
-										});
-									insertJson.goods_pinyin = trStr.replace(/-/g, '');
+										}) +insertJson.goods_name;
+									insertJson.goods_sign = trStr.replace(/-/g, '');
 									DB.insertOne('goods', insertJson, (err) => {
 										if (err) {
 											return res.json(returnRes(5001, '商品添加失败', err));
