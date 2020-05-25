@@ -42,7 +42,7 @@ router.post('/add', (req, res) => {
 		merchant_area: req.body.merchant_area,
 		merchant_adress: req.body.merchant_adress,
 		merchant_note: req.body.merchant_note,
-		merchant_icon: req.body.merchant_icon || 'http://' + req.headers.host + '/images/20200518163731_18641.jpg',
+		merchant_icon: req.body.merchant_icon || 'http://' + req.headers.host + '/images/public.png',
 		create_time: moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')
 	};
 	let MERCHANT_COUNTER = 1; //商户编码
@@ -103,7 +103,7 @@ router.post('/update', (req, res) => {
 		merchant_area: req.body.merchant_area,
 		merchant_adress: req.body.merchant_adress,
 		merchant_note: req.body.merchant_note,
-		merchant_icon: req.body.merchant_icon || 'http://' + req.headers.host + '/images/20200518163731_18641.jpg'
+		merchant_icon: req.body.merchant_icon || 'http://' + req.headers.host + '/images/public.png'
 	};
 	DB.updateOne('merchant', { _id: new DB.ObjectID(req.body.merchant_id) }, updateJson, false, (err) => {
 		if (err) {

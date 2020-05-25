@@ -89,7 +89,7 @@ router.post('/register', (req, res) => {
 		password: MD5(req.body.password),
 		role:req.body.role,
 		phone:req.body.phone,
-		avatar:req.body.avatar || 'http://' + req.headers.host + '/images/20200518163731_18641.jpg'
+		avatar:req.body.avatar || 'http://' + req.headers.host + '/images/public.png'
 	};
 	regParams.role_name = regParams.role == 1?"管理员":"员工"
 	if (!regParams.username || !regParams.password) {
@@ -268,7 +268,7 @@ router.post('/resetpwd', (req, res) => {
 router.post('/update',(req,res)=>{
 	let updateJson = {
 		username:req.body.username,
-		avatar:req.body.avatar ||'http://' + req.headers.host + '/images/20200518163731_18641.jpg',
+		avatar:req.body.avatar ||'http://' + req.headers.host + '/images/public.png',
 		role:req.body.role,
 		phone:req.body.phone,
 	}
