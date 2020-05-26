@@ -20,6 +20,7 @@ var allowCors = function(req, res, next) {
 	res.header('Access-Control-Allow-Credentials', 'true');
 	next();
 };
+
 app.use(allowCors); //使用跨域中间件
 app.use(timeout('8s'));
 app.use(logger('dev'));
