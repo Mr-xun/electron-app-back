@@ -40,6 +40,16 @@ router.post('/createOrder', (req, res) => {
 		create_user: req.body.create_user,
 		merchant_code: req.body.merchant_code
 	};
+	insertJson.order_content.forEach((item) => {
+		DB.findOneAndUpdate(
+			'goods',
+			{ _id: new DB.ObjectID(item._id) },
+			{ $inc: { goods_inventory: -Number(item.buy_counter) } },
+			(data) => {
+				console.log('库存更新成功');
+			}
+		);
+	});
 
 	DB.find(
 		'wholesale',
@@ -80,7 +90,6 @@ router.post('/createOrder', (req, res) => {
 						} else {
 							insertJson.merchant_name = '未知';
 						}
-						console.log(insertJson, 'test');
 						DB.findOneAndUpdate(
 							'field_counter',
 							{
